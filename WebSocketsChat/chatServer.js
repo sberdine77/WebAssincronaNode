@@ -1,8 +1,10 @@
+"use strict";
+
 process.title = "node-chat";
 
 var webSocketsServerPort = 1337;
 
-var websocketServer = requeire('websocket').server;
+var webSocketServer = require('websocket').server;
 var http = require('http');
 
 var history = [];
@@ -18,11 +20,15 @@ var colors = ['red', 'blue', 'green', 'magenta', 'purple', 'plum', 'orange'];
 colors.sort(function(a,b) { return Math.random() > 0.5; } );
 
 var server = http.createServer(function(request, response) {
-    console.log("Server is listening on port " + webSocketsServerPort);
+    //
 });
 
-var wsServer = new websocketServer({
-    httpServer = server
+server.listen(webSocketsServerPort, function() {
+    console.log((new Date()) + "Server is listening on port " + webSocketsServerPort);
+});
+
+var wsServer = new webSocketServer({
+    httpServer: server
 });
 
 wsServer.on('request', function(request) {
@@ -34,13 +40,16 @@ wsServer.on('request', function(request) {
     
     console.log((new Date()) + 'Connection accepted.');
     if (history.length > 0) {
+        console.log('HISTORY');
         connection.sendUTF(JSON.stringify({
             type: 'history', data: history
         }));
     }
 
     connection.on('message', function(message) {
-        if (message.type === 'utf-8') {
+        console.log('MESSAGE');
+        if (message.type === 'utf8') {
+            console.log('utf8');
             if (userName === false) {
                 userName = htmlEntities(message.utf8Data);
                 userColor = colors.shift();
